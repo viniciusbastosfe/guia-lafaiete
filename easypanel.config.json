@@ -1,0 +1,20 @@
+{
+  "name": "guia-lafaiete",
+  "type": "static",
+  "framework": "vite",
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "dist",
+  "nodeVersion": "18",
+  "environmentVariables": [
+    {
+      "name": "VITE_SUPABASE_URL",
+      "required": true,
+      "description": "URL do projeto Supabase"
+    },
+    {
+      "name": "VITE_SUPABASE_ANON_KEY",
+      "required": true,
+      "description": "Chave anon do Supabase"
+    }
+  ]
+}
