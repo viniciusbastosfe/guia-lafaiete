@@ -36,8 +36,32 @@ export const useAuthStore = create<AuthState>()(
       setLoading: (isLoading) => set({ isLoading }),
 
       signOut: async () => {
-        await supabase.auth.signOut()
-        set({ user: null, profile: null, isAdmin: false })
+        try {
+          // Limpar localStorage ANTES de chamar signOut
+          localStorage.removeItem('auth-storage')
+          
+          // SignOut do Supabase
+          const { error } = await supabase.auth.signOut()
+          if (error) {
+            console.error('Erro ao fazer logout:', error)
+          }
+          
+          // Limpar estado
+          set({ user: null, profile: null, isAdmin: false })
+          
+          // Garantir que o localStorage foi limpo
+          localStorage.removeItem('auth-storage')
+          sessionStorage.clear()
+          
+          // Recarregar página para limpar qualquer cache
+          window.location.href = '/'
+        } catch (error) {
+          console.error('Erro crítico no logout:', error)
+          // Mesmo com erro, limpar tudo
+          localStorage.clear()
+          sessionStorage.clear()
+          window.location.href = '/'
+        }
       },
 
       checkAuth: async () => {
