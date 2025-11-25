@@ -28,5 +28,4 @@ dist-ssr
 .env.local
 !.env.production
 
-
 sync_config.jsonc
