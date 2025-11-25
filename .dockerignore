@@ -9,5 +9,5 @@ dist-ssr
 !.env.production
 
 # Ignorar apenas o env local
-.env
+#.env
 .env.local
