@@ -36,57 +36,72 @@ export const useAuthStore = create<AuthState>()(
       setLoading: (isLoading) => set({ isLoading }),
 
       signOut: async () => {
+        console.log('🚨 signOut CHAMADO')
         try {
-          // Limpar localStorage ANTES de chamar signOut
+          console.log('1️⃣ Limpando localStorage...')
           localStorage.removeItem('auth-storage')
           
-          // SignOut do Supabase
+          console.log('2️⃣ Chamando supabase.auth.signOut()...')
           const { error } = await supabase.auth.signOut()
           if (error) {
-            console.error('Erro ao fazer logout:', error)
+            console.error('❌ Erro ao fazer logout:', error)
+            throw error
           }
+          console.log('3️⃣ Supabase signOut OK')
           
-          // Limpar estado
+          console.log('4️⃣ Limpando estado...')
           set({ user: null, profile: null, isAdmin: false })
           
-          // Garantir que o localStorage foi limpo
+          console.log('5️⃣ Limpando storage...')
           localStorage.removeItem('auth-storage')
           sessionStorage.clear()
           
-          // Recarregar página para limpar qualquer cache
-          window.location.href = '/'
+          console.log('6️⃣ Redirecionando...')
+          setTimeout(() => {
+            window.location.href = '/'
+          }, 100)
         } catch (error) {
-          console.error('Erro crítico no logout:', error)
-          // Mesmo com erro, limpar tudo
+          console.error('❌ Erro crítico no logout:', error)
           localStorage.clear()
           sessionStorage.clear()
-          window.location.href = '/'
+          setTimeout(() => {
+            window.location.href = '/'
+          }, 100)
         }
       },
 
       checkAuth: async () => {
         try {
+          console.log('🔍 checkAuth iniciado')
           set({ isLoading: true })
           
           const { data: { session } } = await supabase.auth.getSession()
+          console.log('📝 Sessão:', { hasSession: !!session, userId: session?.user?.id })
           
           if (session?.user) {
             set({ user: session.user })
             
-            const { data: profile } = await supabase
+            console.log('📊 Buscando profile do usuário...')
+            const { data: profile, error } = await supabase
               .from('users')
               .select('*')
               .eq('id', session.user.id)
               .single()
             
+            console.log('👤 Profile:', { found: !!profile, error: error?.message })
+            
             if (profile) {
               set({ profile, isAdmin: (profile as any).is_admin })
+              console.log('✅ Profile carregado:', { email: (profile as any).email, isAdmin: (profile as any).is_admin })
+            } else {
+              console.warn('⚠️ Profile não encontrado na tabela users')
             }
           } else {
             set({ user: null, profile: null, isAdmin: false })
+            console.log('❌ Sem sessão')
           }
         } catch (error) {
-          console.error('Error checking auth:', error)
+          console.error('❌ Error checking auth:', error)
           set({ user: null, profile: null, isAdmin: false })
         } finally {
           set({ isLoading: false })
