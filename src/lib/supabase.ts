@@ -1,26 +1,19 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-// Debug: Log para verificar variáveis (remover em produção)
-console.log('🔍 Supabase Config:', {
-  url: supabaseUrl ? '✅ Configurada' : '❌ Faltando',
-  key: supabaseAnonKey ? '✅ Configurada' : '❌ Faltando',
-  env: import.meta.env.MODE
-})
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ ERRO: Variáveis de ambiente do Supabase não configuradas!')
-  console.error('📋 Variáveis esperadas:', {
-    VITE_SUPABASE_URL: supabaseUrl || 'FALTANDO',
-    VITE_SUPABASE_ANON_KEY: supabaseAnonKey ? 'CONFIGURADA' : 'FALTANDO'
+if (!supabaseUrl || !supabaseKey) {
+  console.error('❌ Variáveis do Supabase ausentes!', {
+    VITE_SUPABASE_URL: supabaseUrl,
+    VITE_SUPABASE_ANON_KEY: supabaseKey,
+    env: import.meta.env.MODE
   })
-  throw new Error('Missing Supabase environment variables. Verifique as variáveis no EasyPanel.')
+  throw new Error('Missing Supabase environment variables.')
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
