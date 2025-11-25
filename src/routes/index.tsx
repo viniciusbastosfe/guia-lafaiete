@@ -32,6 +32,7 @@ import UserPanel from '@/pages/user/UserPanel'
 import Debug from '@/pages/Debug'
 import TestConnection from '@/pages/TestConnection'
 import TestData from '@/pages/TestData'
+import TestQuery from '@/pages/TestQuery'
 import SearchResults from '@/pages/public/SearchResults'
 import DesignShowcase from '@/pages/DesignShowcase'
 
@@ -43,6 +44,7 @@ export function AppRoutes() {
         <Route path="/debug" element={<Debug />} />
         <Route path="/test" element={<TestConnection />} />
         <Route path="/test-data" element={<TestData />} />
+        <Route path="/test-query" element={<TestQuery />} />
         <Route path="/busca" element={<SearchResults />} />
         <Route path="/design" element={<DesignShowcase />} />
         <Route path="/eventos" element={<Events />} />
