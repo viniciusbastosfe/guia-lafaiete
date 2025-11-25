@@ -10,11 +10,21 @@ export default function TestQuery() {
     setLoading(true)
     
     try {
-      const { data, error } = await supabase
+      // Adicionar timeout de 5 segundos
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('⏰ TIMEOUT: Query demorou mais de 5 segundos')), 5000)
+      )
+      
+      const queryPromise = supabase
         .from('events')
         .select('id, title, is_active')
         .eq('is_active', true)
         .limit(5)
+      
+      const { data, error } = await Promise.race([
+        queryPromise,
+        timeoutPromise
+      ]) as any
       
       console.log('📊 RESULTADO:', { 
         sucesso: !error, 
@@ -23,9 +33,9 @@ export default function TestQuery() {
         data: data 
       })
       
-      setResult({ data, error, count: data?.length })
+      setResult({ data, error: error?.message, count: data?.length })
     } catch (err: any) {
-      console.error('❌ ERRO CATCH:', err)
+      console.error('❌ ERRO CATCH:', err.message)
       setResult({ error: err.message })
     } finally {
       setLoading(false)
