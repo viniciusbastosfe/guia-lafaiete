@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react'
 import { useState } from 'react'
 import { useAuthStore } from '@/stores/authStore'
@@ -7,11 +7,10 @@ import { Logo } from '@/components/ui/Logo'
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { user, isAdmin, signOut } = useAuthStore()
-  const navigate = useNavigate()
 
   const handleSignOut = async () => {
     await signOut()
-    navigate('/')
+    // Não precisa de navigate, signOut já redireciona
   }
 
   return (

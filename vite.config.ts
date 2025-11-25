@@ -19,7 +19,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false, // Desabilitar sourcemap em produção para evitar problemas de CSP
+    minify: 'esbuild', // Usar esbuild (padrão do Vite, não precisa instalar)
     rollupOptions: {
       output: {
         manualChunks: {

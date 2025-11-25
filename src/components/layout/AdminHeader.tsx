@@ -1,14 +1,12 @@
 import { Bell, User, LogOut } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
-import { useNavigate } from 'react-router-dom'
 
 export function AdminHeader() {
   const { profile, signOut } = useAuthStore()
-  const navigate = useNavigate()
 
   const handleSignOut = async () => {
     await signOut()
-    navigate('/login')
+    // Não precisa de navigate, signOut já redireciona
   }
 
   return (
