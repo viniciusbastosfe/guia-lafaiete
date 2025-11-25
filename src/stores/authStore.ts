@@ -37,15 +37,34 @@ export const useAuthStore = create<AuthState>()(
 
       signOut: async () => {
         console.log('🚨 signOut CHAMADO')
+        
+        // Forçar logout mesmo se Supabase travar
+        const forceLogout = () => {
+          console.log('⚠️ Forçando logout...')
+          set({ user: null, profile: null, isAdmin: false })
+          localStorage.clear()
+          sessionStorage.clear()
+          window.location.href = '/'
+        }
+        
+        // Timeout de segurança: se não responder em 2s, forçar logout
+        const timeoutId = setTimeout(() => {
+          console.error('⏰ Timeout: Supabase não respondeu')
+          forceLogout()
+        }, 2000)
+        
         try {
           console.log('1️⃣ Limpando localStorage...')
           localStorage.removeItem('auth-storage')
           
           console.log('2️⃣ Chamando supabase.auth.signOut()...')
-          const { error } = await supabase.auth.signOut()
+          const { error } = await supabase.auth.signOut({ scope: 'local' })
+          
+          // Cancelar timeout se completou
+          clearTimeout(timeoutId)
+          
           if (error) {
             console.error('❌ Erro ao fazer logout:', error)
-            throw error
           }
           console.log('3️⃣ Supabase signOut OK')
           
@@ -53,20 +72,15 @@ export const useAuthStore = create<AuthState>()(
           set({ user: null, profile: null, isAdmin: false })
           
           console.log('5️⃣ Limpando storage...')
-          localStorage.removeItem('auth-storage')
+          localStorage.clear()
           sessionStorage.clear()
           
           console.log('6️⃣ Redirecionando...')
-          setTimeout(() => {
-            window.location.href = '/'
-          }, 100)
+          window.location.href = '/'
         } catch (error) {
+          clearTimeout(timeoutId)
           console.error('❌ Erro crítico no logout:', error)
-          localStorage.clear()
-          sessionStorage.clear()
-          setTimeout(() => {
-            window.location.href = '/'
-          }, 100)
+          forceLogout()
         }
       },
 
