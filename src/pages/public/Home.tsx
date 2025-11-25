@@ -21,12 +21,20 @@ export default function Home() {
   const { data: events } = useQuery<any[]>({
     queryKey: ['featured-events'],
     queryFn: async () => {
-      const { data } = await supabase
+      console.log('🎪 Buscando eventos...')
+      const { data, error } = await supabase
         .from('events')
         .select('*, cities(name)')
         .eq('is_active', true)
         .order('start_datetime', { ascending: true })
         .limit(10)
+      
+      if (error) {
+        console.error('❌ Erro ao buscar eventos:', error)
+        return []
+      }
+      
+      console.log('✅ Eventos carregados:', data?.length)
       return data || []
     }
   })
@@ -38,12 +46,20 @@ export default function Home() {
   const { data: companies } = useQuery<any[]>({
     queryKey: ['featured-companies'],
     queryFn: async () => {
-      const { data } = await supabase
+      console.log('🏬 Buscando empresas...')
+      const { data, error } = await supabase
         .from('companies')
         .select('*, cities(name), company_categories(name)')
         .eq('is_active', true)
         .eq('is_featured', true)
         .limit(2)
+      
+      if (error) {
+        console.error('❌ Erro ao buscar empresas:', error)
+        return []
+      }
+      
+      console.log('✅ Empresas carregadas:', data?.length)
       return data || []
     }
   })
@@ -52,10 +68,18 @@ export default function Home() {
   const { data: categories } = useQuery<any[]>({
     queryKey: ['categories'],
     queryFn: async () => {
-      const { data } = await supabase
+      console.log('🏷️ Buscando categorias...')
+      const { data, error } = await supabase
         .from('company_categories')
         .select('*')
         .limit(8)
+      
+      if (error) {
+        console.error('❌ Erro ao buscar categorias:', error)
+        return []
+      }
+      
+      console.log('✅ Categorias carregadas:', data?.length)
       return data || []
     }
   })
