@@ -1,0 +1,160 @@
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabase'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Search, Users, Instagram, Youtube, MapPin } from 'lucide-react'
+import { getInitials } from '@/lib/utils'
+import { Link } from 'react-router-dom'
+
+export default function Influencers() {
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const { data: influencers, isLoading } = useQuery<any[]>({
+    queryKey: ['influencers', searchTerm],
+    queryFn: async () => {
+      let query = supabase
+        .from('profiles')
+        .select('*, cities(name)')
+        .eq('type', 'influencer')
+        .eq('is_active', true)
+        .order('is_featured', { ascending: false })
+
+      if (searchTerm) {
+        query = query.ilike('name', `%${searchTerm}%`)
+      }
+
+      const { data, error } = await query
+      if (error) throw error
+      return data
+    },
+  })
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-pink-600 to-purple-600 text-white py-16">
+        <div className="container mx-auto px-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Influenciadores</h1>
+          <p className="text-xl text-white/90">
+            Conheça os influenciadores digitais de Conselheiro Lafaiete e região
+          </p>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Busca */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Search className="h-5 w-5" />
+              Buscar Influenciadores
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Input
+              placeholder="Buscar por nome..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-md"
+            />
+          </CardContent>
+        </Card>
+
+        {/* Grid de Influenciadores */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i}>
+                <CardHeader className="text-center">
+                  <Skeleton className="h-24 w-24 rounded-full mx-auto mb-4" />
+                  <Skeleton className="h-6 w-3/4 mx-auto" />
+                  <Skeleton className="h-4 w-1/2 mx-auto" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-2/3" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : influencers && influencers.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {influencers.map((influencer) => (
+              <Link key={influencer.id} to={`/perfis/${influencer.id}`}>
+                <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer group">
+                  <CardHeader className="text-center">
+                    <Avatar className="h-24 w-24 mx-auto mb-4 ring-4 ring-pink-100 group-hover:ring-pink-300 transition-all">
+                      <AvatarImage src={influencer.avatar_url} />
+                      <AvatarFallback className="bg-gradient-to-br from-pink-400 to-purple-500 text-white text-2xl">
+                        {getInitials(influencer.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <CardTitle className="group-hover:text-pink-600 transition-colors">
+                        {influencer.name}
+                      </CardTitle>
+                      {influencer.is_featured && (
+                        <Badge variant="default" className="bg-pink-500">Destaque</Badge>
+                      )}
+                    </div>
+                    {influencer.cities && (
+                      <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
+                        <MapPin className="h-4 w-4" />
+                        {influencer.cities.name}
+                      </div>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {influencer.bio && (
+                      <p className="text-sm text-gray-600 text-center line-clamp-2">
+                        {influencer.bio}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-center gap-4 pt-2">
+                      {influencer.instagram_url && (
+                        <a
+                          href={influencer.instagram_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-pink-600 hover:text-pink-700"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Instagram className="h-5 w-5" />
+                        </a>
+                      )}
+                      {influencer.youtube_url && (
+                        <a
+                          href={influencer.youtube_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-red-600 hover:text-red-700"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Youtube className="h-5 w-5" />
+                        </a>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <Card className="text-center py-12">
+            <CardContent>
+              <Users className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Nenhum influenciador encontrado</h3>
+              <p className="text-gray-600">
+                Tente ajustar sua busca ou volte mais tarde
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  )
+}

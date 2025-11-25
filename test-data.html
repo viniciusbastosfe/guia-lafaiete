@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste de Dados - Guia Lafaiete</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Teste de Conexão Supabase</h1>
+    <div id="result"></div>
+
+    <script>
+        const supabaseUrl = 'https://rihcfdnvujmkhmcaanon.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpaGNmZG52dWpta2htY2Fhbm9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5NTk4MTksImV4cCI6MjA3OTUzNTgxOX0.jPbN-oS8mZ3kSUbGvVKJF773i86MIcdIyyd7DaAHFYI'
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+
+        async function testData() {
+            const resultDiv = document.getElementById('result')
+            resultDiv.innerHTML = '<p>Testando conexão...</p>'
+
+            try {
+                // Testar eventos
+                const { data: events, error: eventsError } = await supabase
+                    .from('events')
+                    .select('*')
+                    .limit(5)
+
+                if (eventsError) throw eventsError
+
+                // Testar empresas
+                const { data: companies, error: companiesError } = await supabase
+                    .from('companies')
+                    .select('*')
+                    .limit(5)
+
+                if (companiesError) throw companiesError
+
+                // Testar perfis
+                const { data: profiles, error: profilesError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .limit(5)
+
+                if (profilesError) throw profilesError
+
+                // Mostrar resultados
+                resultDiv.innerHTML = `
+                    <h2>✅ Conexão OK!</h2>
+                    <h3>Eventos: ${events?.length || 0}</h3>
+                    <pre>${JSON.stringify(events, null, 2)}</pre>
+                    <h3>Empresas: ${companies?.length || 0}</h3>
+                    <pre>${JSON.stringify(companies, null, 2)}</pre>
+                    <h3>Perfis: ${profiles?.length || 0}</h3>
+                    <pre>${JSON.stringify(profiles, null, 2)}</pre>
+                `
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h2>❌ Erro!</h2>
+                    <pre>${JSON.stringify(error, null, 2)}</pre>
+                `
+            }
+        }
+
+        testData()
+    </script>
+</body>
+</html>
