@@ -9,8 +9,14 @@ export function Header() {
   const { user, isAdmin, signOut } = useAuthStore()
 
   const handleSignOut = async () => {
-    await signOut()
-    // Não precisa de navigate, signOut já redireciona
+    console.log('🚪 LOGOUT INICIADO - Header')
+    console.log('📦 localStorage antes:', localStorage.getItem('auth-storage'))
+    try {
+      await signOut()
+      console.log('✅ signOut executado com sucesso')
+    } catch (error) {
+      console.error('❌ Erro no signOut:', error)
+    }
   }
 
   return (
