@@ -22,6 +22,9 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copia os arquivos gerados pelo Vite para o Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
 
+# Copia configuração Nginx customizada para SPA
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expõe a porta HTTP
 EXPOSE 80
 
