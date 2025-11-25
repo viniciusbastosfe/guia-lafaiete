@@ -1,0 +1,5 @@
+# Redirects para SPA - Guia Lafaiete v2.0.0
+# Autor: Vinícius Bastos (https://midias.me)
+
+# Todas as rotas retornam index.html para o React Router funcionar
+/*    /index.html   200
